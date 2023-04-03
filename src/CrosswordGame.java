@@ -1,8 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-public class CrosswordGame extends JPanel {
+public class CrosswordGame extends JPanel implements ActionListener {
     private String[][] cwArr;
     private ArrayList<JTextField> textFieldList = new ArrayList<JTextField>();
     private Clue[] clueList;
@@ -52,14 +54,34 @@ public class CrosswordGame extends JPanel {
             }
         }
         JPanel cluePanel = new JPanel();
+        JPanel acrossCluePanel = new JPanel();
+        acrossCluePanel.setLayout(new GridLayout(5, 1));
         initializeAcrossClues();
+        for (int i = 0; i < 5; i++) {
+            JButton y = new JButton(clueList[i].getClue());
+            Font font1 = new Font("Courier New", Font.BOLD, 15);
+            y.setFont(font1);
+            acrossCluePanel.add(y);
+        }
+        cluePanel.add(acrossCluePanel);
+        JPanel downCluePanel = new JPanel();
         initializeVerticalClues();
-        for (int i = 0; i < clueList.length; i++) {
-            JLabel y = new JLabel(clueList[i].getClueNum() + ". " + clueList[i].getClue());
-            cluePanel.add(y);
+        for (int i = 5; i < clueList.length; i++) {
+            JButton y = new JButton(clueList[i].getClue());
+            Font font1 = new Font("Courier New", Font.BOLD, 15);
+            y.setFont(font1);
+            acrossCluePanel.add(y);
         }
         bigPanel.add(cluePanel);
         frame.setVisible(true);
+    }
+
+    public Clue[] getClueList() {
+        return clueList;
+    }
+
+    public Letter[] getLetterList() {
+        return letterList;
     }
 
     public ArrayList<JTextField> getTextFieldList() {
@@ -147,4 +169,12 @@ public class CrosswordGame extends JPanel {
     }
 
 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object source = e.getSource();
+        JButton button =  (JButton) source;
+        if (button.getText().equals("Scale, as a rock wall")) {
+
+        }
+    }
 }

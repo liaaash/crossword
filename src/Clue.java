@@ -15,7 +15,5 @@ public class Clue {
     public int getClueNum() {
         return clueNum;
     }
-    
-
 
 }
