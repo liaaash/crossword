@@ -22,6 +22,7 @@ public class Letter {
         return letter;
     }
 
+
     public JTextField getTextField() {
         return textField;
     }
