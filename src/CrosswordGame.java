@@ -1,28 +1,50 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.awt.Color;
 
-public class CrosswordGame extends JPanel {
+public class CrosswordGame extends JPanel implements ActionListener, MouseListener {
     private String[][] cwArr;
     private ArrayList<JTextField> textFieldList = new ArrayList<JTextField>();
-    private Clue[] clueList;
-    private Letter[] letterList;
+    private AcrossClue[] acrossClueList;
+    private DownClue[] downClueList;
+    private Letter[][] letterList;
+    private SpringLayout panelLayout;
+    private JButton selectedClue;
+    private JButton revealWord;
+    private JButton revealBoard;
+    private JButton clearBoard;
+    private JButton checkBoard;
+
+    private ArrayList<String> letterList2;
+    private JButton checkWord;
+    //private String
+
+    private boolean mousePressed = false;
+    int clueNum = 0;
 
     public CrosswordGame() {
-        clueList = new Clue[10];
-        letterList = new Letter[25];
+        acrossClueList = new AcrossClue[5];
+        downClueList = new DownClue[5];
+        letterList = new Letter[5][5];
+        panelLayout = new SpringLayout();
         Font font = new Font("Courier New", Font.BOLD, 30);
         JFrame frame = new JFrame();
         frame.setSize(1000, 1000);
         frame.setTitle("Crossword Game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JPanel bigPanel = new JPanel();
-        bigPanel.setLayout(new GridLayout(2,1));
+        bigPanel.setLayout(new BoxLayout(bigPanel, BoxLayout.PAGE_AXIS));
         frame.add(bigPanel);
         JPanel grid = new JPanel();
         grid.setLayout(new GridLayout(5, 5));
         grid.setSize(800, 500);
         bigPanel.add(grid);
+        bigPanel.add(buttonPanel);
         cwArr= new String[][]{
                 {"C", "L", "I", "M", "B"},
                 {"C", "O", "M", "E", "T"},
@@ -51,14 +73,12 @@ public class CrosswordGame extends JPanel {
                 }
             }
         }
-        JPanel cluePanel = new JPanel();
-        initializeAcrossClues();
-        initializeVerticalClues();
-        for (int i = 0; i < clueList.length; i++) {
-            JLabel y = new JLabel(clueList[i].getClueNum() + ". " + clueList[i].getClue());
-            cluePanel.add(y);
-        }
-        bigPanel.add(cluePanel);
+        JPanel clues = new JPanel();
+        clues.setLayout(new BoxLayout(clues, BoxLayout.LINE_AXIS));
+        clues.add(initializeClueButtons("across"));
+        clues.add(initializeClueButtons("down"));
+        bigPanel.add(clues);
+        initializeLetters();
         frame.setVisible(true);
     }
 
@@ -69,12 +89,18 @@ public class CrosswordGame extends JPanel {
         return cwArr;
     }
 
+    public AcrossClue[] getAcrossClueList() { return acrossClueList; }
+
+    public DownClue[] getDownClueList() { return downClueList; }
+
+    public Letter[][] getLetterList() { return letterList; }
+
     public void initializeAcrossClues() {
-        clueList[0] = (new Clue("Scale, as a rock wall", 1));
-        clueList[1] = (new Clue("Streaker in the night sky", 6));
-        clueList[2] = (new Clue("Twinklers in the night sky", 7));
-        clueList[3] = (new Clue("Popular brand of fur-lined boot", 8));
-        clueList[4] = (new Clue("Witness", 9));
+        acrossClueList[0] = (new AcrossClue("climb", "Scale, as a rock wall", 1, "across"));
+        acrossClueList[1] = (new AcrossClue("comet", "Streaker in the night sky", 2, "across"));
+        acrossClueList[2] = (new AcrossClue("stars","Twinklers in the night sky", 3,"across"));
+        acrossClueList[3] = (new AcrossClue("xuggx","Popular brand of fur-lined boot", 4, "across"));
+        acrossClueList[4] = (new AcrossClue("xseex", "Witness", 5, "across"));
     }
 
     public void initializeVerticalClues(){
@@ -86,45 +112,53 @@ public class CrosswordGame extends JPanel {
     }
 
     public void initializeLetters() {
-        letterList[0] = (new Letter("c"));
-        letterList[1] = new Letter("l");
-        letterList[2] = new Letter("i");
-        letterList[3] = new Letter("m");
-        letterList[4] = new Letter("b");
-        letterList[5] = (new Letter("c"));
-        letterList[6] = (new Letter("o"));
-        letterList[7] = (new Letter("m"));
-        letterList[8] = (new Letter("e"));
-        letterList[9] = (new Letter("t"));
-        letterList[10] = (new Letter("s"));
-        letterList[11] = (new Letter("t"));
-        letterList[12] = (new Letter("a"));
-        letterList[13] = (new Letter("r"));
-        letterList[14] = (new Letter("s"));
-        letterList[15] = (new Letter("x"));
-        letterList[16] = (new Letter("u"));
-        letterList[17] = (new Letter("g"));
-        letterList[18] = (new Letter("g"));
-        letterList[19] = (new Letter("x"));
-        letterList[20] = (new Letter("x"));
-        letterList[21] = (new Letter("s"));
-        letterList[22] =(new Letter("e"));
-        letterList[23] = (new Letter("e"));
-        letterList[24] = (new Letter("x"));
+        letterList[0][0] = (new Letter("c"));
+        letterList[0][1]= new Letter("l");
+        letterList[0][2] = new Letter("i");
+        letterList[0][3] = new Letter("m");
+        letterList[0][4] = new Letter("b");
+        letterList[1][0] = (new Letter("c"));
+        letterList[1][1] = (new Letter("o"));
+        letterList[1][2] = (new Letter("m"));
+        letterList[1][3] = (new Letter("e"));
+        letterList[1][4] = (new Letter("t"));
+        letterList[2][0] = (new Letter("s"));
+        letterList[2][1] = (new Letter("t"));
+        letterList[2][2] = (new Letter("a"));
+        letterList[2][3] = (new Letter("r"));
+        letterList[2][4] = (new Letter("s"));
+        letterList[3][0] = (new Letter("x"));
+        letterList[3][1] = (new Letter("u"));
+        letterList[3][2] = (new Letter("g"));
+        letterList[3][3] = (new Letter("g"));
+        letterList[3][4] = (new Letter("x"));
+        letterList[4][0] = (new Letter("x"));
+        letterList[4][1] = (new Letter("s"));
+        letterList[4][2] =(new Letter("e"));
+        letterList[4][3] = (new Letter("e"));
+        letterList[4][4] = (new Letter("x"));
         ArrayList<JTextField> arr;
-        for (int i = 0; i < letterList.length; i ++) {
-            letterList[i].setTextField(textFieldList.get(i));
+        int x = 0;
+        for (int i = 0; i < letterList.length; i++) {
+            for (int j = 0; j < letterList[0].length; j++) {
+                letterList[i][j].setTextField(textFieldList.get(x));
+                x++;
+            }
         }
     }
-
     public void checkBoard() {
         int count = 0;
+        int x = 0;
         for (int i = 0; i<letterList.length; i++) {
-            if(letterList[i].getTextField().getText().equals(letterList[i].getLetter())){
-                letterList[i].getTextField().setBackground(Color.GREEN);
-                count++;
-            } else {
-                letterList[i].getTextField().setBackground(Color.RED);
+            for (int j = 0; j < letterList[0].length; j++) {
+                if(letterList[i][j].getTextField().getText().equals(letterList[i][j].getLetter())){
+                    letterList[i][j].getTextField().setBackground(Color.GREEN);
+                    x++;
+                    count++;
+                } else {
+                    letterList[i][j].getTextField().setBackground(Color.RED);
+                    x++;
+                }
             }
         }
         if (count == 25) {
@@ -134,17 +168,197 @@ public class CrosswordGame extends JPanel {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             JPanel panel = new JPanel();
             frame.add(panel);
-            JTextArea x = new JTextArea();
-            x.setText("You win! CONGRATS!");
-            panel.add(x);
+            JLabel x1 = new JLabel();
+            x1.setText("You win! CONGRATS!");
+            panel.add(x1);
         }
     }
 
     public void clearBoard() {
-        for (JTextField x : textFieldList) {
-            x.setText("");
+        for (int i = 0; i < textFieldList.size(); i++) {
+            textFieldList.get(i).setText("");
+        }
+        textFieldList.get(15).setText("x");
+        textFieldList.get(19).setText("x");
+        textFieldList.get(20).setText("x");
+        textFieldList.get(24).setText("x");
+        
+    }
+
+    public JPanel initializeClueButtons(String type){
+        JPanel cluesGrid = new JPanel();
+        cluesGrid.setLayout(new GridLayout(5,1));
+        Clue[] clueList;
+        if (type.equals("across")) {
+            initializeAcrossClues();
+            clueList = acrossClueList;
+        } else {
+            initializeDownClues();
+            clueList = downClueList;
+        }
+        for (int i = 0; i < 5; i++) {
+            JButton y = new JButton(clueList[i].getClue());
+            y.addActionListener(this);
+            y.addMouseListener(this);
+            cluesGrid.add(y);
+        }
+        return cluesGrid;
+    }
+
+    public JButton getSelectedClue(){
+        return selectedClue;
+    }
+
+    public void lightUpDown(int clueNum) {
+        for (int i = 0; i<textFieldList.size(); i++) {
+            textFieldList.get(i).setBackground(Color.WHITE);
+        }
+        textFieldList.get(15).setBackground(Color.BLACK);
+        textFieldList.get(19).setBackground(Color.BLACK);
+        textFieldList.get(20).setBackground(Color.BLACK);
+        textFieldList.get(24).setBackground(Color.BLACK);
+        for (int i = 0; i < 5; i ++) {
+            for(int j = 0; j<1; j++ ) {
+                letterList[i][clueNum - 6].getTextField().setBackground(Color.CYAN);
+                textFieldList.get(15).setBackground(Color.BLACK);
+                textFieldList.get(19).setBackground(Color.BLACK);
+                textFieldList.get(20).setBackground(Color.BLACK);
+                textFieldList.get(24).setBackground(Color.BLACK);
+            }
         }
     }
 
+    public void lightUpAcross(int clueNum) {
+        for (int i = 0; i< textFieldList.size(); i++) {
+            textFieldList.get(i).setBackground(Color.WHITE);
+        }
+        textFieldList.get(15).setBackground(Color.BLACK);
+        textFieldList.get(19).setBackground(Color.BLACK);
+        textFieldList.get(20).setBackground(Color.BLACK);
+        textFieldList.get(24).setBackground(Color.BLACK);
+        for (int i = 0; i < 5; i ++) {
+            letterList[clueNum - 1][i].getTextField().setBackground(Color.CYAN);
+            textFieldList.get(15).setBackground(Color.BLACK);
+            textFieldList.get(19).setBackground(Color.BLACK);
+            textFieldList.get(20).setBackground(Color.BLACK);
+            textFieldList.get(24).setBackground(Color.BLACK);
+        }
+    }
+    public void revealBoard() {
+        int x = 0;
+        for (int i = 0; i < letterList.length; i++) {
+            for (int j = 0; j < letterList[0].length; j++) {
+                textFieldList.get(i).setText(letterList[i][j].getLetter());
+                x++;
+            }
+        }
+    }
 
+    public void revealWord(int clueNum) {
+        if (clueNum <= 5) {
+            String[] word = acrossClueList[clueNum-1].getWord().split("");
+            for (int i = 0; i < 5; i ++) {
+                letterList[clueNum - 1][i].getTextField().setText(word[i]);
+                textFieldList.get(15).setBackground(Color.BLACK);
+                textFieldList.get(19).setBackground(Color.BLACK);
+                textFieldList.get(20).setBackground(Color.BLACK);
+                textFieldList.get(24).setBackground(Color.BLACK);
+            }
+        } else if (clueNum > 5) {
+            String[] word = downClueList[clueNum-1].getWord().split("");
+            for (int i = 0; i < 5; i ++) {
+                letterList[i][clueNum - 6].getTextField().setText(word[i]);
+                textFieldList.get(15).setBackground(Color.BLACK);
+                textFieldList.get(19).setBackground(Color.BLACK);
+                textFieldList.get(20).setBackground(Color.BLACK);
+                textFieldList.get(24).setBackground(Color.BLACK);
+            }
+        }
+
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object source = e.getSource();
+        JButton button = (JButton) source;
+        if (button.getText().equals("Scale, as a rock wall")) {
+            selectedClue = button;
+            clueNum = 1;
+            lightUpAcross(1);
+        } else if (button.getText().equals("Streaker in the night sky")) {
+            lightUpAcross(2);
+            clueNum = 2;
+            selectedClue = button;
+        } else if (button.getText().equals("Twinklers in the night sky")) {
+            lightUpAcross(3);
+            clueNum = 3;
+            selectedClue = button;
+        } else if (button.getText().equals("Popular brand of fur-lined boot")) {
+            lightUpAcross(4);
+            clueNum = 4;
+            selectedClue = button;
+        } else if (button.getText().equals("Witness")) {
+            lightUpAcross(5);
+            clueNum = 5;
+            selectedClue = button;
+        } else if (button.getText().equals("Loops in on a thread")) {
+            lightUpDown(6);
+            clueNum = 6;
+            selectedClue = button;
+        } else if (button.getText().equals("Cross-legged meditation")) {
+            lightUpDown(7);
+            clueNum = 7;
+            selectedClue = button;
+        } else if (button.getText().equals("Mirror _____")) {
+            lightUpDown(8);
+            clueNum = 8;
+            selectedClue = button;
+        } else if (button.getText().equals("Join together")) {
+            lightUpDown(9);
+            clueNum = 9;
+            selectedClue = button;
+        } else if (button.getText().equals("Best-selling group in Korean music history")) {
+            lightUpDown(10);
+            clueNum = 10;
+            selectedClue = button;
+        } else if(button.getText().equals("REVEAL WORD")) {
+            revealWord(clueNum);
+        } else if(button.getText().equals("REVEAL BOARD")) {
+
+        } else if(button.getText().equals("CHECK BOARD")) {
+
+        } else if(button.getText().equals("CHECK BOARD")) {
+            checkBoard();
+        } else if(button.getText().equals("CHECK WORD")) {
+
+        } else if (button.getText().equals("CLEAR BOARD")) {
+            clearBoard();
+        }
+    }
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        Object source = e.getSource();
+        JButton button = (JButton) source;
+        button.setBackground(Color.CYAN);
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
 }
