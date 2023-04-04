@@ -3,11 +3,13 @@ public class Clue {
     private String clue;
     private String word;
     private int clueNum;
+    private Clue[] clueList;
 
-    public Clue(String word, String clue, int clueNum) {
+    public Clue(String word, String clue, int clueNum, Clue[] clueList) {
         this.clue = clue;
         this.clueNum = clueNum;
-        word = null;
+        this.word = word;
+        this.clueList =  clueList;
     }
 
     public String getClue() {

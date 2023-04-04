@@ -1,6 +1,7 @@
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
+//credit: StackOverFlow question (https://stackoverflow.com/questions/12793030/jtextfield-limiting-character-amount-input-and-accepting-numeric-only
 
 class JTextFieldLimit extends PlainDocument {
     private int limit;
