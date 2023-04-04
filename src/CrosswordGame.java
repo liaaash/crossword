@@ -33,6 +33,24 @@ public class CrosswordGame extends JPanel implements ActionListener, MouseListen
         letterList = new Letter[5][5];
         panelLayout = new SpringLayout();
         Font font = new Font("Courier New", Font.BOLD, 30);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
+        revealWord = new JButton ("REVEAL WORD");
+        revealWord.addActionListener(this);
+        buttonPanel.add(revealWord);
+        revealBoard = new JButton ("REVEAL BOARD");
+        revealBoard.addActionListener(this);
+        buttonPanel.add(revealBoard);
+        checkWord = new JButton ("CLEAR WORD");
+        checkWord.addActionListener(this);
+        buttonPanel.add(checkWord);
+        checkBoard = new JButton ("CHECK BOARD");
+        checkBoard.addActionListener(this);
+        buttonPanel.add(checkBoard);
+        clearBoard = new JButton("CLEAR BOARD");
+        clearBoard.addActionListener(this);
+        buttonPanel.add(clearBoard);
+
         JFrame frame = new JFrame();
         frame.setSize(1000, 1000);
         frame.setTitle("Crossword Game");
@@ -52,6 +70,7 @@ public class CrosswordGame extends JPanel implements ActionListener, MouseListen
                 {"X", "U", "G", "G", "X"},
                 {"X", "S", "E", "E", "X"}
         };
+
         for (String[] x : cwArr) {
             for (String y : x) {
                 if (y.equals("X")) {
@@ -85,6 +104,7 @@ public class CrosswordGame extends JPanel implements ActionListener, MouseListen
     public ArrayList<JTextField> getTextFieldList() {
         return textFieldList;
     }
+
     public String[][] getCwArr() {
         return cwArr;
     }
@@ -103,12 +123,12 @@ public class CrosswordGame extends JPanel implements ActionListener, MouseListen
         acrossClueList[4] = (new AcrossClue("xseex", "Witness", 5, "across"));
     }
 
-    public void initializeVerticalClues(){
-        clueList[5] = (new Clue("Loops in on a thread", 1));
-        clueList[6] = (new Clue("Cross-legged meditation", 2));
-        clueList[7] = (new Clue("Mirror _____", 3));
-        clueList[8] = (new Clue("Join together", 4));
-        clueList[9] = (new Clue("Best-selling group in Korean music history", 5));
+    public void initializeDownClues(){
+        downClueList[0] = (new DownClue("CCS", "Loops in on a thread", 6, "down"));
+        downClueList[1] = (new DownClue("lotus", "Cross-legged meditation", 7, "down"));
+        downClueList[2] = (new DownClue("image", "Mirror _____", 8, "down"));
+        downClueList[3] = (new DownClue("merge", "Join together", 9, "down"));
+        downClueList[4] = (new DownClue("bts","Best-selling group in Korean music history", 10, "down"));
     }
 
     public void initializeLetters() {

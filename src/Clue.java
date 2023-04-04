@@ -1,8 +1,10 @@
 public class Clue {
+
     private String clue;
     private String word;
     private int clueNum;
-    public Clue(String clue, int clueNum) {
+
+    public Clue(String word, String clue, int clueNum) {
         this.clue = clue;
         this.clueNum = clueNum;
         word = null;
